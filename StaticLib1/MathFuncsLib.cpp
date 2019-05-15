@@ -13,47 +13,25 @@ template <class T> const T& max(const T& a, const T& b) {
 	return (a < b) ? b : a;
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // Constructor
-////////////////////////////////////////////////////////////////////////////////
 BigNumber::BigNumber()
 {
 }
 
 BigNumber::BigNumber(short x) { initFromUnSigned(x); }
 
-BigNumber::BigNumber(std::string    s)
-{
-	std::string x = s;
-	//cas du moins
-	if (x[0] == '-') {
-		sign = Sign::MINUS;
-		x = x.substr(1, x.length() - 1);
-	}
-	else
-		sign = Sign::PLUS;
 
-	char c;
-	Lastone = x.length() - 1;
-	for (int i = x.length() - 1; i >= 0; i--) {
-		c = x[i] - '0';
-		if ((c >= 0) && (c <= 9))
-			Number1[Lastone - i] = c;
-		else {
-			printf("char error not a digit\n");
-			Number1[Lastone - i] = 0; //TODO d¨¦clanchement d'erreur
-		}
-	}
-	norma();
-}
 BigNumber::BigNumber(std::vector  <int> s)
 {
 
 	std::vector  <int> x = s;
+
 	//cas du moins
+	//if the sign is -
 	if (x[0] == '-') {
 		sign = Sign::MINUS;
-		for (int i = 1; i < x.size() - 1; i++) {
+		for (int i = 1; i < x.size() - 1; i++) //get the left number
+		{
 			x[i-1] = x[i];
 		}
 	}
@@ -61,11 +39,11 @@ BigNumber::BigNumber(std::vector  <int> s)
 		sign = Sign::PLUS;
 
 	char c;
-	Lastone = x.size() - 1;
+	Lastone = x.size() - 1;// get the last one
 	for (int i = x.size() - 1; i >= 0; i--) {
-		c = x[i] - 0;
+		c = x[i] - 0;//get the size;
 		if ((c >= 0) && (c <= 9))
-			Number1[Lastone - i] = c;
+			Number1[Lastone - i] = c;//get the number;
 		else {
 			printf("char error not a digit\n");
 			Number1[Lastone - i] = 0; //TODO d¨¦clanchement d'erreur
@@ -74,9 +52,8 @@ BigNumber::BigNumber(std::vector  <int> s)
 	norma();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+
 // Copy constructor
-////////////////////////////////////////////////////////////////////////////////
 BigNumber::BigNumber(const BigNumber &n) {
 	//cas n=n;
 	if (this == &n)
@@ -85,7 +62,7 @@ BigNumber::BigNumber(const BigNumber &n) {
 	this->sign = n.sign;
 	this->Lastone = n.Lastone;
 	for (unsigned int i = 0; i <= n.Lastone; i++)
-		this->Number1[i] = n.Number1[i];
+		this->Number1[i] = n.Number1[i];//copy the number;
 }
 
 BigNumber::BigNumber(const BigNumber* n) {
@@ -96,12 +73,12 @@ BigNumber::BigNumber(const BigNumber* n) {
 	this->sign = n->sign;
 	this->Lastone = n->Lastone;
 	for (unsigned int i = 0; i <= n->Lastone; i++)
-		this->Number1[i] = n->Number1[i];
+		this->Number1[i] = n->Number1[i];//copy the number;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+
 // templates
-////////////////////////////////////////////////////////////////////////////////
+//
 template <class X> void BigNumber::initFromSigned(X x)
 {
 	//only Number1
@@ -129,22 +106,21 @@ template <class X> void BigNumber::initFromUnSigned(X x)
 		}
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // operator
-////////////////////////////////////////////////////////////////////////////////
+
 void BigNumber::operator=(const BigNumber &n) {
 	this->initia();
 	this->sign = n.sign;
 	this->Lastone = n.Lastone;
 	for (unsigned int i = 0; i <= n.Lastone; i++)
-		this->Number1[i] = n.Number1[i];
+		this->Number1[i] = n.Number1[i];//copy and get the number
 }
 
 void BigNumber::copy(const BigNumber &n) {
 	this->sign = n.sign;
 	this->Lastone = n.Lastone;
 	for (unsigned int i = 0; i <= n.Lastone; i++)
-		this->Number1[i] = n.Number1[i];
+		this->Number1[i] = n.Number1[i];//copy and get the number
 }
 void BigNumber::absolute(const BigNumber &n) {
 	this->copy(n);
@@ -154,15 +130,15 @@ void BigNumber::absolute(const BigNumber &n) {
 
 std::ostream & operator << (std::ostream& sortie, const BigNumber & n)
 {
-	std::stringstream oss;
+	std::stringstream p;
 	if (n.sign == BigNumber::Sign::MINUS)
-		oss << "-";
+		p << "-";
 	char a;
 	for (int tmp = n.Lastone; tmp >= 0; tmp--) {
 		a = n.Number1[tmp] + '0';
-		oss << a;
+		p << a;
 	}
-	sortie << oss.str();
+	sortie << p.str();
 	return sortie;
 }
 
@@ -358,23 +334,23 @@ void BigNumber::addpos(const BigNumber &a, const BigNumber &b)
 {
 	unsigned int max_Number1 = max(a.Lastone, b.Lastone);
 	//~ printf("max Number1 %i\n", max_Number1);
-	char tmp, carry = 0;
+	char tmp, hold = 0;
 
 	//~ this->sign = Sign::PLUS;
 	for (unsigned int i = 0; i <= max_Number1; i++) {
-		tmp = a.Number1[i] + b.Number1[i] + carry;
+		tmp = a.Number1[i] + b.Number1[i] + hold;
 		if (tmp > 9) {
 			this->Number1[i] = tmp - 10;
-			carry = 1;
+			hold = 1;
 		}
 		else {
 			this->Number1[i] = tmp;
-			carry = 0;
+			hold = 0;
 		}
 	}
 	//~ printf("max Number1 %i\n", this->Number1[max_Number1]);
-	if (carry != 0) {
-		this->Number1[max_Number1 + 1] = carry;
+	if (hold != 0) {
+		this->Number1[max_Number1 + 1] = hold;
 		this->Lastone = max_Number1 + 1;
 	}
 	else
@@ -383,20 +359,20 @@ void BigNumber::addpos(const BigNumber &a, const BigNumber &b)
 
 void BigNumber::subpos(const BigNumber &a, const BigNumber &b)
 {
-	char borrow = 0;
+	char bor = 0;
 	char v;
 	unsigned int i;
 
 	this->Lastone = a.Lastone;
 
 	for (i = 0; i <= a.Lastone; i++) {
-		v = a.Number1[i] - borrow - b.Number1[i];
+		v = a.Number1[i] - bor - b.Number1[i];
 		if (v < 0) {
 			v = v + 10;
-			borrow = 1;
+			bor = 1;
 		}
 		else
-			borrow = 0;
+			bor = 0;
 
 		this->Number1[i] = v;
 	}
@@ -461,23 +437,23 @@ void BigNumber::mulByChar(const BigNumber &n, const char a)
 
 	char v;
 	unsigned int i;
-	char carry = 0;
+	char hold = 0;
 
 	this->Lastone = n.Lastone;
 	for (i = 0; i <= n.Lastone; i++) {
-		v = n.Number1[i] * a + carry;
+		v = n.Number1[i] * a + hold;
 		if (v > 9) {
-			carry = v / 10;
+			hold = v / 10;
 			this->Number1[i] = v % 10;
 		}
 		else {
-			carry = 0;
+			hold = 0;
 			this->Number1[i] = v;
 		}
 	}
-	if (carry != 0) { //TODO cas capacity
+	if (hold != 0) { //TODO cas capacity
 		this->Lastone++;
-		this->Number1[this->Lastone] = carry;
+		this->Number1[this->Lastone] = hold;
 	}
 }
 

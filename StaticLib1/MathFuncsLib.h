@@ -17,7 +17,7 @@ public:
 	// Constructors from primitive integer types
 	
 	BigNumber(short x);
-	BigNumber(std::string s);
+
 	BigNumber(std::vector<int>s);
 
 	BigNumber(const BigNumber &n);
